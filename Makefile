@@ -24,6 +24,10 @@ front-run-dev:
 front-lint-fix:
 	cd ${CUR_DIR}/ui && npm run lint-fix
 
+.PHONY: front-build
+front-build:
+	cd ${CUR_DIR}/ui && npm run build
+
 .PHONY: build
 build:
 	cd ${CUR_DIR}/ui && npm run build
@@ -47,3 +51,11 @@ docker-build:
 .PHONY: docker-push
 docker-push: docker-build
 	docker push ghcr.io/iximiuz/kexp:latest
+
+.PHONY: release
+release:
+	goreleaser --clean
+
+.PHONY: release-snapshot
+release-snapshot:
+	goreleaser release --snapshot --clean
