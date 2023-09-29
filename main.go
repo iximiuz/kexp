@@ -55,7 +55,7 @@ func main() {
 
 	flags.AddFlags(cmd.PersistentFlags())
 	cmd.PersistentFlags().StringVar(&flags.host, "host", "127.0.0.1", "Listening host")
-	cmd.PersistentFlags().StringVar(&flags.port, "port", "8090", "Listening port")
+	cmd.PersistentFlags().StringVar(&flags.port, "port", "5173", "Listening port")
 
 	if err := cmd.Execute(); err != nil {
 		logrus.WithError(err).Fatal("Command failed")

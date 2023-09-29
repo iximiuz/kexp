@@ -28,29 +28,13 @@ front-lint-fix:
 front-build:
 	cd ${CUR_DIR}/ui && npm run build
 
-.PHONY: build
-build:
+.PHONY: build-dev
+build-dev:
 	cd ${CUR_DIR}/ui && npm run build
 	go build -o ${CUR_DIR}/bin/kexp ${CUR_DIR}/main.go
 	CGO_ENABLED=0 go build \
 		-ldflags "-X main.version=${VERSION} -X main.commit=${GIT_COMMIT} -X main.date=${UTC_NOW}" \
 		-o ${CUR_DIR}/bin/kexp main.go
-
-.PHONY: docker-build
-docker-build:
-	cd ${CUR_DIR}/ui && npm run build
-	docker buildx build \
-		--progress plain \
-		--build-arg BUILD_VERSION=${VERSION} \
-		--build-arg BUILD_COMMIT=${GIT_COMMIT} \
-		--build-arg BUILD_DATE=${UTC_NOW} \
-		-t ghcr.io/iximiuz/kexp:latest \
-		-f ${CUR_DIR}/Dockerfile \
-		${CUR_DIR}
-
-.PHONY: docker-push
-docker-push: docker-build
-	docker push ghcr.io/iximiuz/kexp:latest
 
 .PHONY: release
 release:
