@@ -1,0 +1,53 @@
+{
+  "name": "ui",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build --base=/ui",
+    "serve": "vite --host 127.0.0.1 preview",
+    "lint": "eslint .",
+    "lint-fix": "eslint --fix .",
+    "type-check": "tsc --noEmit; vue-tsc --noEmit"
+  },
+  "dependencies": {
+    "@heroicons/vue": "^2.0.18",
+    "@kubernetes/client-node": "^0.18.1",
+    "@vueuse/core": "^10.3.0",
+    "axios": "^1.4.0",
+    "axios-retry": "^3.7.0",
+    "buffer": "^6.0.3",
+    "codejar": "^4.1.0",
+    "cytoscape": "^3.20.0",
+    "cytoscape-dagre": "^2.3.2",
+    "cytoscape-node-html-label": "^1.2.2",
+    "js-yaml": "^4.1.0",
+    "pinia": "^2.0.14",
+    "prismjs": "^1.29.0",
+    "util": "^0.12.5",
+    "uuid": "^9.0.0",
+    "vue": "^3.2.27"
+  },
+  "devDependencies": {
+    "@types/prismjs": "^1.26.0",
+    "@types/uuid": "^9.0.2",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "autoprefixer": "^10.4.0",
+    "daisyui": "^3.5.0",
+    "eslint": "^8.48.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-anti-trojan-source": "^1.1.1",
+    "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-security-node": "^1.1.1",
+    "eslint-plugin-vue": "^9.1.1",
+    "postcss": "^8.4.29",
+    "postcss-scrollbar": "^0.5.1",
+    "tailwindcss": "^3.0.6",
+    "typescript": "^5.2.2",
+    "vite": "^4.3.9",
+    "vite-plugin-checker": "^0.6.2",
+    "vue-eslint-parser": "^9.3.1",
+    "vue-tsc": "^1.8.10"
+  }
+}

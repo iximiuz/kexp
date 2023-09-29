@@ -1,0 +1,15 @@
+*.so
+*.dylib
+*.test
+*.out
+*.swp
+*.swo
+*.local
+.vagrant
+node_modules
+.DS_Store
+dist
+dist-ssr
+__debug_bin
+
+/bin/*

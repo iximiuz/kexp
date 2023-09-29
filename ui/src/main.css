@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Source Code Pro';
+  src: url('/fonts/Source_Code_Pro/static/SourceCodePro-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@layer utilities {
+  .scrollbar-hidden {
+    scrollbar-width: none;
+  }
+
+  body:not(.platform-mac) .scrollbar-styled {
+    scrollbar-color: rgb(204, 204, 204, 0.6) transparent;
+    scrollbar-width: thin;
+  }
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 21px;
+
+  @apply scrollbar-hidden;
+}
+
+.container-waiting {
+  @apply bg-status-waiting;
+}
+.container-starting {
+  @apply bg-status-starting;
+}
+.container-not-ready {
+  @apply bg-status-not-ready;
+}
+.container-ready {
+  @apply bg-status-ready;
+}
+.container-terminated-ok {
+  @apply bg-status-terminated-ok;
+  /* A green diagonal line  */
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+}
+.container-terminated-ko {
+  @apply bg-status-terminated-ko;
+  /* A red diagonal line  */
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(0, 0, 0, 0.1) 10px,
+    rgba(0, 0, 0, 0.1) 20px
+  );
+}

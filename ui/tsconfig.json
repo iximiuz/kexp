@@ -1,0 +1,62 @@
+{
+  "compileOnSave": true,
+
+  "compilerOptions": {
+    "module": "esnext",
+
+    "moduleResolution": "bundler",
+
+    "resolveJsonModule": true,
+
+    "jsx": "preserve",
+
+    "jsxImportSource": "vue",
+
+    "noImplicitAny": true,
+
+    "noImplicitThis": true,
+
+    "noImplicitReturns": true,
+
+    "strict": true,
+
+    "verbatimModuleSyntax": true,
+
+    "isolatedModules": true,
+
+    "target": "esnext",
+
+    "useDefineForClassFields": true,
+
+    "esModuleInterop": true,
+
+    "forceConsistentCasingInFileNames": true,
+
+    "skipLibCheck": true,
+
+    "allowJs": true,
+
+    "noEmit": true,
+
+    "types": ["vite/client"],
+
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
+  },
+
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "tests/**/*.ts",
+    "tests/**/*.tsx"
+  ],
+
+  "exclude": [
+
+  ]
+}
