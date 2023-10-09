@@ -6,7 +6,7 @@ UTC_NOW=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 .PHONY: back-run-dev
 back-run-dev:
-	go run ${CUR_DIR}/main.go --host 0.0.0.0
+	go run ${CUR_DIR}/main.go --host 0.0.0.0 --port 8090
 
 .PHONY: back-fmt
 back-fmt:
