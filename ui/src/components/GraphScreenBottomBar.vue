@@ -39,6 +39,20 @@ defineProps({
         </span>
       </button>
     </div>
+
+    <div class="ml-auto mr-1">
+      <a
+        target="_blank"
+        href="https://github.com/iximiuz/kexp"
+        class="h-5 w-5"
+      >
+        <img
+          src="/logos/github.png"
+          alt="GitHub project page"
+          class="h-5 w-5"
+        >
+      </a>
+    </div>
   </div>
 </template>
 
