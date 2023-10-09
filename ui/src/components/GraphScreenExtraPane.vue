@@ -31,11 +31,12 @@ const showed = computed(() => !!appStore.inspectedKubeObject);
 
 watch(showed, (showed) => {
   if (showed) {
-    if (width.value === 0) {
+    if (width.value < minWidth) {
       width.value = Math.max(minWidth, props.maxWidth / 3); // 1/3 of the screen's main pane width unless it's too small
     }
     if (width.value > props.maxWidth) {
-      width.value = props.maxWidth;
+      // Seems like sometimes maxWidth can be 0... Probably when the real screen size is not known upon the component's mount
+      width.value = Math.max(minWidth, props.maxWidth);
     }
     containerRef.value.style["flex-basis"] = width.value + "px";
   } else {
