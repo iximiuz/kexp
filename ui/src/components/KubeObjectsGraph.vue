@@ -14,7 +14,13 @@ import { onMounted, ref, watchEffect } from "vue";
 
 import { splitGVK } from "../common/kubeutil";
 import { objectRelations } from "../common/relations";
-import { reprContainerStatus, reprInitContainerStatus, reprSidecarContainerStatus } from "../common/repr";
+import {
+  podPhaseClass,
+  reprContainerStatus,
+  reprInitContainerStatus,
+  reprPodPhase,
+  reprSidecarContainerStatus,
+} from "../common/repr";
 import { useAppStore } from "../stores";
 
 const weights = {
@@ -322,9 +328,28 @@ onMounted(() => {
 
         const label = [
           "<div class=\"node-label\">",
-          `<p class="node-label-kind">${data.object.gvk.kind}</p>`,
-          `<p class="node-label-title">${data.object.name}</p>`,
+          `<span class="node-label-kind flex items-center justify-center">${data.object.gvk.kind}`,
         ];
+
+        if (data.object.gvk.toString() === "v1/Pod") {
+          const phase = reprPodPhase(data.object.raw);
+          label.push(`<div title="${phase.title}" class="border ml-2 border-black h-[0.7rem] rounded-full w-[0.7rem] bg-${podPhaseClass[phase.phase]}"></div>`);
+        } else if (data.object.gvk.toString() === "v1/Node") {
+          // TODO: Move this logic to reprNodeStatus.
+          const ready = data.object.raw.status
+            ? data.object.raw.status.conditions.find((c) => c.type === "Ready")
+            : { status: "Unknown" };
+          const readyClass = ready.status === "True"
+            ? "bg-status-ready"
+            : ready.status === "False"
+              ? "bg-status-not-ready"
+              : "bg-status-unknown";
+
+          label.push(`<div title="Ready: ${ready.status}" class="border ml-2 border-black h-[0.7rem] rounded-full w-[0.7rem] ${readyClass}"></div>`);
+        }
+
+        label.push("</span>");
+        label.push(`<p class="node-label-title">${data.object.name}</p>`);
 
         if (data.object.gvk.toString() === "v1/Pod") {
           label.push(..._podLabel(data.object));

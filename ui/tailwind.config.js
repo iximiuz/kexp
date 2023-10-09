@@ -6,6 +6,15 @@ module.exports = {
     './index.html',
     './src/**/*.{vue,js,ts,jsx,tsx}',
   ],
+  safelist: [
+    'bg-status-waiting',
+    'bg-status-starting',
+    'bg-status-not-ready',
+    'bg-status-ready',
+    'bg-status-terminated-ok',
+    'bg-status-terminated-ko',
+    'bg-status-unknown',
+  ],
   darkMode: 'media', // or 'media' or 'class'
   theme: {
     extend: {
@@ -16,6 +25,7 @@ module.exports = {
         "status-ready": "rgb(34, 197, 94)",
         "status-terminated-ok": "#a1dea1",
         "status-terminated-ko": "#e36561",
+        "status-unknown": "#fff",
       },
       fontFamily: {
         sans: ["Inter var", ...defaultTheme.fontFamily.sans],

@@ -38,6 +38,63 @@ function pretty<T extends RawKubeObject>(obj: KubeObject<T>): T {
   };
 }
 
+export type PodPhase = "Unknown" | "Pending" | "NotReady" | "Ready" | "Succeeded" | "Failed";
+
+export interface PodPhaseRepr {
+  phase: PodPhase;
+  title: string;
+  reason?: string;
+  message?: string;
+}
+
+export function reprPodPhase(pod: V1Pod): PodPhaseRepr {
+  // TODO: add the STATUS-like info from the kubectl get pod command.
+
+  if (!pod.status || !pod.status.phase) {
+    return {
+      phase: "Unknown",
+      title: "Unknown",
+      reason: "No Pod status field",
+    };
+  }
+
+  if (pod.status.phase !== "Running") {
+    return {
+      phase: pod.status.phase as PodPhase,
+      title: pod.status.phase,
+    };
+  }
+
+  if (pod.status.phase === "Running") {
+    if ((pod.status.conditions || []).find((c) => c.type === "Ready" && c.status === "True")) {
+      return {
+        phase: "Ready",
+        title: "Running (Ready)",
+      };
+    }
+
+    return {
+      phase: "NotReady",
+      title: "Running (Not Ready)",
+    };
+  }
+
+  return {
+    phase: "Unknown",
+    title: "Unknown",
+    reason: "Unknown Pod phase",
+  };
+}
+
+export const podPhaseClass = {
+  Pending: "status-waiting",
+  NotReady: "status-not-ready",
+  Ready: "status-ready",
+  Succeeded: "status-terminated-ok",
+  Failed: "status-terminated-ko",
+  Unknown: "status-unknown",
+} as Record<PodPhase, string>;
+
 export interface ContainerStatusRepr {
   status: "waiting" | "starting" | "not-ready" | "ready" | "terminated-ok" | "terminated-ko" | "unknown";
   title: string;

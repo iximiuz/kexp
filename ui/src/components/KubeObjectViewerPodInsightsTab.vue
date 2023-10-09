@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 
-import { reprTimeRelative } from "../common/repr";
+import { podPhaseClass, reprTimeRelative, reprPodPhase } from "../common/repr";
 import type { KubeObject, V1Pod } from "../common/types";
 
 import KubeObjectViewerPodConditions from "./KubeObjectViewerPodConditions.vue";
@@ -14,22 +14,7 @@ const props = defineProps<{
   },
 }>();
 
-const phase = computed(() => {
-  // TODO: add the STATUS-like into from the kubectl get pod command.
-  if (!props.object.raw.status || !props.object.raw.status.phase) {
-    return "Unknown";
-  }
-
-  if (props.object.raw.status.phase !== "Running") {
-    return props.object.raw.status.phase;
-  }
-
-  if (!(props.object.raw.status.conditions || []).find((c) => c.type === "Ready" && c.status === "True")) {
-    return "Running (Not Ready)";
-  }
-
-  return "Running (Ready)";
-});
+const phase = computed(() => reprPodPhase(props.object.raw));
 </script>
 
 <template>
@@ -45,15 +30,9 @@ const phase = computed(() => {
         >
           <span
             class="border border-black h-[0.7rem] rounded-full w-[0.7rem]"
-            :class="{
-              'bg-status-waiting': phase === 'Pending',
-              'bg-status-not-ready': phase === 'Running (Not Ready)',
-              'bg-status-ready': phase === 'Running (Ready)',
-              'bg-status-terminated-ok': phase === 'Succeeded',
-              'bg-status-terminated-ko': phase === 'Failed',
-            }"
+            :class="['bg-' + podPhaseClass[phase.phase]]"
           />
-          {{ phase }}
+          {{ phase.title }}
         </div>
         <div>Started:</div>
         <div :title="object.raw.status!.startTime + ''">
