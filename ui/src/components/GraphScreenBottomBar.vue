@@ -9,7 +9,7 @@ defineProps({
 
 <template>
   <div class="bg-base-200 border-neutral-content border-t flex gap-x-2 h-[1.6rem] items-center shrink-0">
-    <span class="flex font-semibold h-full invisible items-center mr-40 px-6">
+    <span class="flex font-semibold h-full invisible items-center mr-32 px-6">
       Kubernetes Explorer
     </span>
 
@@ -48,7 +48,7 @@ defineProps({
       <div class="dropdown dropdown-hover dropdown-top">
         <label
           tabindex="0"
-          class="btn btn-ghost btn-xs gap-1 hover:opacity-100 hover:shadow-none normal-case opacity-70 rounded-none"
+          class="btn btn-ghost btn-xs flex-nowrap gap-1 hover:opacity-100 hover:shadow-none normal-case opacity-70 rounded-none shrink-0"
         >
           <div class="bg-[rgb(21,128,61)] border border-black h-4 rounded-sm w-4" />
           <div class="bg-[rgb(36,158,235)] border border-black h-4 rounded-sm w-4" />
@@ -57,9 +57,9 @@ defineProps({
         </label>
         <ul
           tabindex="0"
-          class="-ml-[50%] bg-base-200 border border-neutral-content dropdown-content flex flex-col gap-y-1 p-2 px-3 rounded-md shadow-lg w-80 z-[50]"
+          class="-left-[18rem] bg-base-200 border border-neutral-content dropdown-content flex flex-col gap-y-1 md:-left-[15rem] px-4 py-3 rounded-md shadow-lg w-[25rem] z-[50]"
         >
-          <h2 class="font-semibold mb-2 text-base">
+          <h2 class="font-semibold mb-3 text-base">
             Color coding of graph objects
           </h2>
 
@@ -76,7 +76,7 @@ defineProps({
             <div class="bg-[rgb(239,68,68)] border border-black h-4 rounded-sm w-4" />&nbsp;- Deletion timestamp is set
           </li>
 
-          <p class="mt-2 text-sm">
+          <p class="mt-3 text-sm">
             Objects are removed from the graph ~5 sec after they disappear from the API response.
           </p>
         </ul>
