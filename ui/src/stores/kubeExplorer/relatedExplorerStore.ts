@@ -11,7 +11,14 @@ import { RelatedWatcher } from "../../common/watchers";
 import { useKubeDataStore } from "../kubeDataStore";
 import { useKubeWatchStore } from "../kubeWatchStore";
 
-import { filterObjects, filterResources, filterResourceGroups, isApplicableObjectFilterExpr } from "./filter";
+import {
+  type Filter,
+  filterObjects,
+  filterResources,
+  filterResourceGroups,
+  isApplicableObjectFilterExpr,
+  parseFilterExpr,
+} from "./filter";
 
 interface TreeNode {
   open?: boolean;
@@ -42,6 +49,7 @@ export const useRelatedExplorerStore = defineStore({
     } as Tree,
 
     filterExpr: null as string | null,
+    filters: [] as Filter[],
   }),
 
   getters: {
@@ -61,7 +69,7 @@ export const useRelatedExplorerStore = defineStore({
           return [];
         }
 
-        return filterResourceGroups(useKubeDataStore().resourceGroups(ctx), this.filterExpr)
+        return filterResourceGroups(useKubeDataStore().resourceGroups(ctx), this.filters)
           .filter((group) => (group.resources || []).some((res) => this.objects(ctx, res).length > 0))
           .sort((a, b) => a.groupVersion.localeCompare(b.groupVersion));
       };
@@ -73,7 +81,7 @@ export const useRelatedExplorerStore = defineStore({
           return [];
         }
 
-        return filterResources(group.resources || [], this.filterExpr)
+        return filterResources(group.resources || [], this.filters)
           .filter((res) => this.objects(ctx, res).length > 0)
           .sort((a, b) => a.name.localeCompare(b.name));
       };
@@ -90,7 +98,7 @@ export const useRelatedExplorerStore = defineStore({
           return [];
         }
 
-        return filterObjects(w.objects(), this.filterExpr)
+        return filterObjects(w.objects(), this.filters)
           .filter((obj) => obj.resource.groupVersion === res.groupVersion && obj.resource.kind === res.kind)
           .sort((a, b) => a.name.localeCompare(b.name));
       };
@@ -114,7 +122,7 @@ export const useRelatedExplorerStore = defineStore({
     },
 
     isResourceOpen(state): (ctx: KubeContext, res: KubeResource) => boolean {
-      return (ctx, res) => (!!this.filterExpr && isApplicableObjectFilterExpr(res, this.filterExpr)) ||
+      return (ctx, res) => isApplicableObjectFilterExpr(res, this.filterExpr, this.filters) ||
         !!_getOrCreateResourceNode(state.tree, ctx.name, res.groupVersion, res.kind).open;
     },
 
@@ -239,10 +247,12 @@ export const useRelatedExplorerStore = defineStore({
 
     setFilterExpr(f: string) {
       this.filterExpr = f.trim();
+      this.filters = parseFilterExpr(this.filterExpr);
     },
 
     clearFilterExpr() {
       this.filterExpr = null;
+      this.filters = [];
     },
 
     _ensureWatcher(ctx: KubeContext) {

@@ -13,7 +13,13 @@ import { ResourceWatcher } from "../../common/watchers";
 import { useKubeDataStore } from "../kubeDataStore";
 import { useKubeWatchStore } from "../kubeWatchStore";
 
-import { filterObjects, filterResources, isApplicableObjectFilterExpr } from "./filter";
+import {
+  type Filter,
+  filterObjects,
+  filterResources,
+  isApplicableObjectFilterExpr,
+  parseFilterExpr,
+} from "./filter";
 import { useRelatedExplorerStore } from "./relatedExplorerStore";
 
 interface TreeNode {
@@ -92,6 +98,7 @@ export const useQuickExplorerStore = defineStore({
         } as Tree,
         selectors: {} as Record<string, Record<string, KubeSelector>>, // { clusterName => { resource { selector }}
         filterExpr: null as string | null,
+        filters: [] as Filter[],
       },
       localStorage,
       { mergeDefaults: true },
@@ -113,14 +120,14 @@ export const useQuickExplorerStore = defineStore({
             groupVersion: quickGroup,
             resources: groups.flatMap((group) => (group.resources || []).filter((res) => gvkToQuickGroup[res.groupVersion + "/" + res.kind as keyof typeof gvkToQuickGroup] === quickGroup)),
           }))
-          .filter((group) => filterResources(group.resources, this.filterExpr).length > 0)
+          .filter((group) => filterResources(group.resources, this._persistent.filters).length > 0)
           .sort((a, b) => quickGroupRank[b.groupVersion as keyof typeof quickGroupRank] - quickGroupRank[a.groupVersion as keyof typeof quickGroupRank]);
       };
     },
 
     resources(): (ctx: KubeContext, group: KubeResourceGroup) => KubeResource[] {
       return (ctx, group) => {
-        return filterResources((group.resources || []), this.filterExpr)
+        return filterResources((group.resources || []), this._persistent.filters)
           .sort((a, b) => a.name.localeCompare(b.name));
       };
     },
@@ -129,7 +136,7 @@ export const useQuickExplorerStore = defineStore({
       return (ctx, res) => {
         const w = this._watcher(ctx, res);
         return w
-          ? filterObjects(w.objects(), this.filterExpr).sort((a, b) => a.name.localeCompare(b.name))
+          ? filterObjects(w.objects(), this._persistent.filters).sort((a, b) => a.name.localeCompare(b.name))
           : [];
       };
     },
@@ -164,7 +171,7 @@ export const useQuickExplorerStore = defineStore({
     },
 
     isResourceOpen(state): (ctx: KubeContext, res: KubeResource) => boolean {
-      return (ctx, res) => (!!this.filterExpr && isApplicableObjectFilterExpr(res, this.filterExpr)) ||
+      return (ctx, res) => isApplicableObjectFilterExpr(res, this.filterExpr, this._persistent.filters) ||
         !!_getOrCreateResourceNode(state._persistent.tree, ctx.name, res.groupVersion, res.kind).open;
     },
 
@@ -294,10 +301,12 @@ export const useQuickExplorerStore = defineStore({
 
     setFilterExpr(f: string) {
       this._persistent.filterExpr = f.trim();
+      this._persistent.filters = parseFilterExpr(this._persistent.filterExpr);
     },
 
     clearFilterExpr() {
       this._persistent.filterExpr = null;
+      this._persistent.filters = [];
     },
 
     _initWatcher(ctx: KubeContext, res: KubeResource) {
