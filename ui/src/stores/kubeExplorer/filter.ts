@@ -1,82 +1,116 @@
 import type { KubeObject, KubeResource, KubeResourceGroup } from "../../common/types";
 
-export function filterObjects(objects: KubeObject[], filterExpr: string | null): KubeObject[] {
-  const [resFilters, nameFilters] = _parseFilterExpr(filterExpr);
-  if (objects.length === 0 || resFilters.length === 0 || nameFilters.length === 0) {
+export interface Filter {
+  resources: string[];
+  names: string[];
+}
+
+export function parseFilterExpr(filterExpr: string | null): Filter[] {
+  const filters: Filter[] = [];
+
+  for (const subExpr of (filterExpr || "").trim().split(";")) {
+    console.log("parsing filter expr", subExpr);
+    const [resFilterExpr, nameFilterExpr] = subExpr.trim().split(/\s+/);
+
+    const resFilters = resFilterExpr.toLowerCase().split(",").filter((f) => !!f);
+    const nameFilters = (nameFilterExpr || "").split(",").filter((f) => !!f);
+
+    if (resFilters.length > 0) {
+      filters.push({
+        resources: resFilters,
+        names: nameFilters,
+      });
+    }
+  }
+
+  console.log("parsed filters", filters);
+  return filters;
+}
+
+export function filterObjects(objects: KubeObject[], filters: Filter[]): KubeObject[] {
+  if (objects.length === 0 || filters.every((f) => f.resources.length === 0 || f.names.length === 0)) {
+    console.log("filtering objects - noop");
     return objects;
   }
 
-  if (_matchingResources([objects[0].resource], resFilters).length === 0) {
-    return [];
+  console.log("filtering objects", objects[0].resource.groupVersion + "/" + objects[0].resource.kind);
+
+  const matched = new Set<string>();
+  for (const f of filters) {
+    console.log("matching object resource filter", f);
+    if (_matchingResources([objects[0].resource], f.resources).length > 0) {
+      console.log("matched object resource filter", f.resources);
+      for (const obj of _matchingObjects(objects, f.names)) {
+        matched.add(obj.ident);
+      }
+    }
   }
 
-  return _matchingObjects(objects, nameFilters);
+  return objects.filter((obj) => !!matched.has(obj.ident));
 }
 
-export function filterResources(resources: KubeResource[], filterExpr: string | null): KubeResource[] {
-  if (!filterExpr) {
+export function filterResources(resources: KubeResource[], filters: Filter[]): KubeResource[] {
+  console.log("filtering resources");
+  if (filters.length === 0) {
     return resources;
   }
 
-  const [resFilters] = _parseFilterExpr(filterExpr);
+  const resFilters = filters.flatMap((f) => f.resources);
+  console.log("matched resources", _matchingResources(resources, resFilters));
   return _matchingResources(resources, resFilters);
 }
 
-export function filterResourceGroups(groups: KubeResourceGroup[], filterExpr: string | null): KubeResourceGroup[] {
-  if (!filterExpr) {
+export function filterResourceGroups(groups: KubeResourceGroup[], filters: Filter[]): KubeResourceGroup[] {
+  if (filters.length === 0) {
     return groups;
   }
 
-  const [resFilters] = _parseFilterExpr(filterExpr);
+  const resFilters = filters.flatMap((f) => f.resources);
   return groups.filter((group) => {
     return _matchingResources(group.resources || [], resFilters).length > 0;
   });
 }
 
-export function isApplicableObjectFilterExpr(res: KubeResource, filterExpr: string | null): boolean {
+export function isApplicableObjectFilterExpr(res: KubeResource, filterExpr: string | null, filters: Filter[]): boolean {
   if (!filterExpr) {
-    return true;
-  }
-
-  const expr = filterExpr.split(/\s+/)[1];
-  if (!expr) {
     return false;
   }
 
-  if (expr === "*") {
-    return true;
+  for (const f of filters) {
+    if (_matchingResources([res], f.resources).length === 0) {
+      continue;
+    }
+
+    console.log("matched resource filter", f.resources);
+    for (const expr of f.names) {
+      if (expr === "*") {
+        return true;
+      }
+
+      const hasSlash = expr.indexOf("/") !== -1;
+      if (!res.namespaced && hasSlash) {
+        continue;
+      }
+      if (res.namespaced && !hasSlash) {
+        continue;
+      }
+
+      const [ns, name] = expr.split("/");
+      if (ns !== "*" && ns.length < 2) {
+        continue;
+      }
+
+      if (hasSlash && (name === "*" || (name || "").length > 1)) {
+        return true;
+      }
+
+      if (!hasSlash && (expr === "*" || (expr || "").length > 1)) {
+        return true;
+      }
+    }
   }
 
-  const hasSlash = expr.indexOf("/") !== -1;
-  if (!res.namespaced && hasSlash) {
-    return false;
-  }
-  if (res.namespaced && !hasSlash) {
-    return false;
-  }
-
-  const [ns, name] = expr.split("/");
-  if (ns !== "*" && ns.length < 2) {
-    return false;
-  }
-
-  if (hasSlash) {
-    return name === "*" || (name || "").length > 1;
-  }
-
-  return true;
-}
-
-function _parseFilterExpr(filterExpr: string | null): [string[], string[]] {
-  const [resFilterExpr, nameFilterExpr] = (filterExpr || "").trim().split(/\s+/);
-
-  const resFilters = resFilterExpr.toLowerCase().split(",");
-  const nameFilters = (nameFilterExpr || "").split(",");
-
-  return [
-    resFilters.filter((f) => !!f),
-    nameFilters.filter((f) => !!f),
-  ];
+  return false;
 }
 
 function _matchingObjects(objects: KubeObject[], filters: string[]): KubeObject[] {
