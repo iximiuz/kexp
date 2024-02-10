@@ -32,9 +32,7 @@ function _containerClass(c: V1Container, kind: "ephemeral" | "init" | "sidecar" 
 
   if (kind !== "ephemeral" && hoveredEphemeral.value && hoveredEphemeral.value.targetContainerName) {
     if (hoveredEphemeral.value.targetContainerName === c.name) {
-      classes.push("opacity-100");
-    } else {
-      classes.push("opacity-50");
+      classes.push("!bg-[rgb(36,158,235)]");
     }
   }
 
