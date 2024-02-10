@@ -2,6 +2,10 @@ import yaml from "js-yaml";
 
 import type { KubeObject, RawKubeObject, RawKubeObjectWithStatus, V1Pod } from "./types";
 
+export function reprYamlRaw(obj: any): string {
+  return yaml.dump(obj);
+}
+
 export function reprYaml(obj: KubeObject): string {
   return yaml.dump(pretty(obj));
 }

@@ -6,6 +6,7 @@ import type { KubeObject, V1Pod, V1Container } from "../common/types";
 
 const props = defineProps<{
   object: KubeObject<V1Pod>,
+  onContainerClick:(container: V1Container) => void,
 }>();
 
 const initContainers = computed(() => {
@@ -86,6 +87,7 @@ function onEphemeralContainerHover(container: V1Container, enter: boolean) {
         :style="{
           'z-index': 130 - idx,
         }"
+        @click.stop="onContainerClick(ic)"
       >
         <div class="-rotate-90">
           <template v-if="ic.name.length <= 2 * regularContainers.length - 1">
@@ -106,6 +108,7 @@ function onEphemeralContainerHover(container: V1Container, enter: boolean) {
           :style="{
             'z-index': 100 + idx,
           }"
+          @click.stop="onContainerClick(c)"
         >
           {{ c.name }}
         </div>
@@ -116,18 +119,19 @@ function onEphemeralContainerHover(container: V1Container, enter: boolean) {
       class="border-black border-l-2 border-t-2 flex flex flex-col grow mt-2 rounded-md"
     >
       <div
-        v-for="(c, idx) in ephemeralContainers"
-        :key="c.name"
+        v-for="(ec, idx) in ephemeralContainers"
+        :key="ec.name"
         class="!tooltip-bottom border-b-2 border-r-2 ephemeral-container grow h-[2.1rem] px-2"
-        :data-tip="_containerTooltip(c, 'ephemeral')"
-        :class="_containerClass(c, 'ephemeral')"
+        :data-tip="_containerTooltip(ec, 'ephemeral')"
+        :class="_containerClass(ec, 'ephemeral')"
         :style="{
           'z-index': 200 - idx,
         }"
-        @mouseenter="onEphemeralContainerHover(c, true)"
-        @mouseleave="onEphemeralContainerHover(c, false)"
+        @click.stop="onContainerClick(ec)"
+        @mouseenter="onEphemeralContainerHover(ec, true)"
+        @mouseleave="onEphemeralContainerHover(ec, false)"
       >
-        {{ c.name }}
+        {{ ec.name }}
       </div>
     </div>
   </div>
