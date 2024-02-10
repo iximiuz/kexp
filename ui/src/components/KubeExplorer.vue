@@ -22,10 +22,11 @@ const quickExplorerStore = useQuickExplorerStore();
 const watchedExplorerStore = useWatchedExplorerStore();
 const kubeWatchStore = useKubeWatchStore();
 
+// Order matters here - hot keys are handled in the order of the stores.
 const stores = [
+  quickExplorerStore,
   allExplorerStore,
   relatedExplorerStore,
-  quickExplorerStore,
   watchedExplorerStore,
 ];
 
@@ -35,11 +36,14 @@ onMounted(() => {
       e.preventDefault();
       e.stopPropagation();
 
-      stores.forEach((store) => {
+      for (const store of stores) {
         if (store.isTreeOpen) {
-          store.setFilterExpr("");
+          if (!store.hasFilterExpr) {
+            store.setFilterExpr("");
+          }
+          break;
         }
-      });
+      }
     }
 
     if (e.key === "Escape") {

@@ -168,6 +168,10 @@ export const useQuickExplorerStore = defineStore({
         !!_getOrCreateResourceNode(state._persistent.tree, ctx.name, res.groupVersion, res.kind).open;
     },
 
+    hasFilterExpr(state): boolean {
+      return !!state._persistent.filterExpr;
+    },
+
     filterExpr(state): string | null {
       return state._persistent.filterExpr;
     },

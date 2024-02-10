@@ -118,6 +118,10 @@ export const useRelatedExplorerStore = defineStore({
         !!_getOrCreateResourceNode(state.tree, ctx.name, res.groupVersion, res.kind).open;
     },
 
+    hasFilterExpr(state): boolean {
+      return !!state.filterExpr;
+    },
+
     _watcher(state): (ctx: KubeContext) => RelatedWatcher | undefined {
       return (ctx) => state._watchers[ctx.name];
     },

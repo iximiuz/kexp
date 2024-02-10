@@ -94,6 +94,10 @@ export const useWatchedExplorerStore = defineStore({
       return (ctx: KubeContext, res: KubeResource) => (!!state.filterExpr && isApplicableObjectFilterExpr(res, state.filterExpr)) ||
         !!_getOrCreateResourceNode(state.tree, ctx.name, res.groupVersion, res.kind).open;
     },
+
+    hasFilterExpr(state): boolean {
+      return !!state.filterExpr;
+    },
   },
 
   actions: {
