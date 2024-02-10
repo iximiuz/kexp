@@ -79,7 +79,7 @@ module.exports = {
       },
     }],
     "vue/multi-word-component-names": ["error", {
-      ignores: [],
+      ignores: ["Copyable"],
     }],
     "vue/static-class-names-order": ["error"],
     "vue/attributes-order": ["error"],

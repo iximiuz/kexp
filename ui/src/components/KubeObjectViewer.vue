@@ -8,6 +8,7 @@ import { useKubeDataStore } from "../stores";
 import KubeObjectViewerActionBar from "./KubeObjectViewerActionBar.vue";
 import KubeObjectViewerMenu from "./KubeObjectViewerMenu.vue";
 import KubeObjectViewerTabs from "./KubeObjectViewerTabs.vue";
+import Copyable from "./base/Copyable.vue";
 
 const props = defineProps<{
   object: KubeObject
@@ -56,7 +57,7 @@ onMounted(async() => {
       namespace: props.object.namespace,
     }, (err) => {
       if (err) {
-        console.error("KubeObjectViewer: watch inpsected object error", props.object, err);
+        console.error("KubeObjectViewer: watch inspected object error", props.object, err);
       }
     });
     cleaner.addCleanup(unwatch);
@@ -73,10 +74,12 @@ onMounted(async() => {
           class="block font-semibold truncate"
           :class="objectClass"
         >
-          <div
+          <Copyable
             :title="titleText"
             class="truncate"
-          >{{ titleText }}</div>
+            :copy-text="object.name"
+            :text="titleText"
+          />
         </a>
 
         <KubeObjectViewerMenu :object="object" />

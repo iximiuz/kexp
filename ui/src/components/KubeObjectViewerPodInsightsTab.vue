@@ -7,6 +7,7 @@ import type { KubeObject, V1Container, V1Pod } from "../common/types";
 import CodeEditor from "./CodeEditor.vue";
 import KubeObjectViewerPodConditions from "./KubeObjectViewerPodConditions.vue";
 import KubeObjectViewerPodContainers from "./KubeObjectViewerPodContainers.vue";
+import Copyable from "./base/Copyable.vue";
 
 const props = defineProps<{
   object: KubeObject<V1Pod>,
@@ -68,7 +69,7 @@ const selectedContainerYaml = computed(() => {
         <div class="cursor-default">
           IPs:
         </div>
-        <div>{{ object.raw.status!.podIPs?.map((el) => el.ip)?.join(" ") }}</div>
+        <Copyable :text="object.raw.status!.podIPs?.map((el) => el.ip)?.join(' ') || ''" />
       </div>
 
       <div>
