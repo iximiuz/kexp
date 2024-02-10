@@ -16,14 +16,14 @@ import KubeExplorerExpandableItem from "./KubeExplorerExpandableItem.vue";
 import KubeExplorerFilter from "./KubeExplorerFilter.vue";
 import SimpleLoader from "./base/SimpleLoader.vue";
 
-const allExlorerStore = useAllExplorerStore();
+const allExplorerStore = useAllExplorerStore();
 const relatedExplorerStore = useRelatedExplorerStore();
 const quickExplorerStore = useQuickExplorerStore();
 const watchedExplorerStore = useWatchedExplorerStore();
 const kubeWatchStore = useKubeWatchStore();
 
 const stores = [
-  allExlorerStore,
+  allExplorerStore,
   relatedExplorerStore,
   quickExplorerStore,
   watchedExplorerStore,
@@ -63,7 +63,7 @@ onMounted(() => {
     </div>
 
     <KubeExplorerExpandableItem
-      :toggle="() => { quickExplorerStore.toggleTree(); quickExplorerStore.isTreeOpen && allExlorerStore.closeTree(); }"
+      :toggle="() => { quickExplorerStore.toggleTree(); quickExplorerStore.isTreeOpen && allExplorerStore.closeTree(); }"
       :is-open="quickExplorerStore.isTreeOpen"
       :scrollable="true"
       class="min-h-[1.8rem]"
@@ -127,11 +127,11 @@ onMounted(() => {
     </KubeExplorerExpandableItem>
 
     <KubeExplorerExpandableItem
-      :toggle="() => { allExlorerStore.toggleTree(); allExlorerStore.isTreeOpen && quickExplorerStore.closeTree(); }"
-      :is-open="allExlorerStore.isTreeOpen"
+      :toggle="() => { allExplorerStore.toggleTree(); allExplorerStore.isTreeOpen && quickExplorerStore.closeTree(); }"
+      :is-open="allExplorerStore.isTreeOpen"
       :scrollable="true"
       class="border-neutral-content border-t min-h-[1.8rem]"
-      :class="[allExlorerStore.isTreeOpen ? 'grow-1' : '']"
+      :class="[allExplorerStore.isTreeOpen ? 'grow-1' : '']"
     >
       <template #title>
         <span class="font-bold text-sm uppercase">All objects</span>
@@ -145,16 +145,16 @@ onMounted(() => {
         </div>
 
         <KubeExplorerDropdownMenu
-          v-if="allExlorerStore.isTreeOpen"
+          v-if="allExplorerStore.isTreeOpen"
           class="-mr-[1rem] ml-auto"
-          :store="allExlorerStore"
+          :store="allExplorerStore"
         />
       </template>
 
       <template #subtitle>
         <KubeExplorerFilter
-          v-if="allExlorerStore.isTreeOpen && allExlorerStore.filterExpr !== null"
-          :store="allExlorerStore"
+          v-if="allExplorerStore.isTreeOpen && allExplorerStore.filterExpr !== null"
+          :store="allExplorerStore"
           class="w-full"
         />
       </template>
@@ -163,10 +163,10 @@ onMounted(() => {
         <SimpleLoader
           loading-class="ml-3"
           error-class="ml-3"
-          :load="() => allExlorerStore.loadContexts()"
+          :load="() => allExplorerStore.loadContexts()"
         >
           <div
-            v-if="allExlorerStore.contexts().length === 0"
+            v-if="allExplorerStore.contexts().length === 0"
             class="select-none"
           >
             No contexts found
@@ -175,12 +175,12 @@ onMounted(() => {
             v-else
           >
             <li
-              v-for="ctx in allExlorerStore.contexts()"
+              v-for="ctx in allExplorerStore.contexts()"
               :key="ctx.name"
             >
               <KubeExplorerContextItem
                 :context="ctx"
-                :store="allExlorerStore"
+                :store="allExplorerStore"
               />
             </li>
           </ul>
