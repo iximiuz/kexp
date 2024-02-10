@@ -102,7 +102,7 @@ export interface ContainerStatusRepr {
   message?: string;
 }
 
-export function reprContainerStatus(pod: V1Pod, name: string, opts?: { kind: "init" | "sidecar" | "regular" }): ContainerStatusRepr {
+export function reprContainerStatus(pod: V1Pod, name: string, opts?: { kind: "ephemeral" | "init" | "sidecar" | "regular" }): ContainerStatusRepr {
   if (!pod.status) {
     return {
       status: "unknown",
@@ -112,7 +112,9 @@ export function reprContainerStatus(pod: V1Pod, name: string, opts?: { kind: "in
 
   const statuses = opts && (opts.kind === "init" || opts.kind === "sidecar")
     ? pod.status.initContainerStatuses
-    : pod.status.containerStatuses;
+    : (opts && opts.kind === "ephemeral")
+      ? pod.status.ephemeralContainerStatuses
+      : pod.status.containerStatuses;
   if (!statuses) {
     return {
       status: "unknown",
@@ -137,7 +139,7 @@ export function reprContainerStatus(pod: V1Pod, name: string, opts?: { kind: "in
     };
   }
 
-  if (opts && opts.kind === "init" && status.state.running) {
+  if (opts && (opts.kind === "init" || opts.kind === "ephemeral") && status.state.running) {
     return {
       status: "ready",
       title: "Running",
