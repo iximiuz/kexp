@@ -11,6 +11,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 var errUnknownContext = errors.New("unknown context")
