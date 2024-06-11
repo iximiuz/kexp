@@ -10,7 +10,14 @@ import type {
 import { useKubeDataStore } from "../kubeDataStore";
 import { useKubeWatchStore } from "../kubeWatchStore";
 
-import { filterObjects, filterResources, filterResourceGroups, isApplicableObjectFilterExpr } from "./filter";
+import {
+  type Filter,
+  filterObjects,
+  filterResources,
+  filterResourceGroups,
+  isApplicableObjectFilterExpr,
+  parseFilterExpr,
+} from "./filter";
 import { useRelatedExplorerStore } from "./relatedExplorerStore";
 
 interface TreeNode {
@@ -38,6 +45,7 @@ export const useWatchedExplorerStore = defineStore({
     } as Tree,
 
     filterExpr: null as string | null,
+    filters: [] as Filter[],
   }),
 
   getters: {
@@ -52,7 +60,7 @@ export const useWatchedExplorerStore = defineStore({
 
     resourceGroups(): (ctx: KubeContext) => KubeResourceGroup[] {
       return (ctx: KubeContext) => {
-        return filterResourceGroups(useKubeDataStore().resourceGroups(ctx), this.filterExpr)
+        return filterResourceGroups(useKubeDataStore().resourceGroups(ctx), this.filters)
           .filter((group) => (group.resources || []).some((res) => this.objects(ctx, res).length > 0))
           .sort((a, b) => a.groupVersion.localeCompare(b.groupVersion));
       };
@@ -60,7 +68,7 @@ export const useWatchedExplorerStore = defineStore({
 
     resources(): (ctx: KubeContext, group: KubeResourceGroup) => KubeResource[] {
       return (ctx: KubeContext, group: KubeResourceGroup) => {
-        return filterResources(group.resources || [], this.filterExpr)
+        return filterResources(group.resources || [], this.filters)
           .filter((res) => this.objects(ctx, res).length > 0)
           .sort((a, b) => a.name.localeCompare(b.name));
       };
@@ -68,7 +76,7 @@ export const useWatchedExplorerStore = defineStore({
 
     objects() {
       return (ctx: KubeContext, res: KubeResource) => {
-        return filterObjects(useKubeWatchStore().objects(ctx, res), this.filterExpr)
+        return filterObjects(useKubeWatchStore().objects(ctx, res), this.filters)
           .sort((a, b) => a.name.localeCompare(b.name));
       };
     },
@@ -91,7 +99,7 @@ export const useWatchedExplorerStore = defineStore({
     },
 
     isResourceOpen: (state) => {
-      return (ctx: KubeContext, res: KubeResource) => (!!state.filterExpr && isApplicableObjectFilterExpr(res, state.filterExpr)) ||
+      return (ctx: KubeContext, res: KubeResource) => isApplicableObjectFilterExpr(res, state.filterExpr, state.filters) ||
         !!_getOrCreateResourceNode(state.tree, ctx.name, res.groupVersion, res.kind).open;
     },
 
@@ -162,10 +170,12 @@ export const useWatchedExplorerStore = defineStore({
 
     setFilterExpr(f: string) {
       this.filterExpr = f.trim();
+      this.filters = parseFilterExpr(this.filterExpr);
     },
 
     clearFilterExpr() {
       this.filterExpr = null;
+      this.filters = [];
     },
   },
 });
